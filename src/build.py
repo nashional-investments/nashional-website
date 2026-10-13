@@ -24,7 +24,7 @@ FIRM = {
     "iapd_firm": "https://adviserinfo.sec.gov/firm/summary/289955",
     "iapd_jeff": "https://adviserinfo.sec.gov/individual/summary/6031965",
     "iapd_denver": "https://adviserinfo.sec.gov/individual/summary/7319835",
-    "privacy_pdf": "",
+    "privacy_pdf": "https://8fd02778-254e-4c6b-9457-885597ce99f4.filesusr.com/ugd/9e295d_71730603e58a41e0b800faa7c49184c5.pdf",
 }
 
 # Contact form: Wix Forms in the free Wix Headless project "Nashional Investments Contact Form".
@@ -840,7 +840,7 @@ def insurance():
     return body, [ld]
 
 def privacy():
-    body = (page_hero([("privacy", "Privacy Policy")], "Privacy policy", "How we protect your information.", f"This policy applies to Nashional Independent Investment Management LLC, doing business as Nashional Investments, McKinney, Texas. {F('Set effective date at launch')}", ctas=False)
+    body = (page_hero([("privacy", "Privacy Policy")], "Privacy policy", "How we protect your information.", f"This policy applies to Nashional Independent Investment Management LLC, doing business as Nashional Investments, McKinney, Texas. Until our revised policy is adopted, the <a href=\"{FIRM['privacy_pdf']}\">privacy policy currently in force (PDF)</a> governs.", ctas=False)
             + band(f'''<div class="prose">
 <h2>Our commitment</h2><p>Protecting your personal information is part of our duty as your adviser. We hold ourselves to professional standards of confidentiality, and we explain here what we collect, how we use it and the choices you have.</p>
 <h2>What we collect</h2><p>We collect nonpublic personal information that you give us or authorize us to obtain, such as your name, address, date of birth, Social Security number, income, assets, account numbers and balances, and investment experience. We also receive information about your accounts from custodians and other firms you authorize.</p>
@@ -851,7 +851,7 @@ def privacy():
 <li>When required by law, regulators or court order.</li></ul>
 <p>You may ask us at any time to stop our affiliates from using your information to market to you. Your choice applies until you tell us otherwise.</p>
 <h2>Technology and service providers</h2><p>We use technology providers, including software that uses artificial intelligence, to support research and operations. They may process information only to provide services to us, under confidentiality and security obligations. We do not sell your personal information.</p>
-<h2>Our website</h2><p>When you use our contact form, we receive the information you enter, which is processed by our website host. Our planning tools run in your browser and do not store or send what you enter. Our site loads fonts from Google, which may receive your IP address. {F('Add analytics provider here if one is added')}</p>
+<h2>Our website</h2><p>When you use our contact form, we receive the information you enter, which is processed by our website host. Our planning tools run in your browser and do not store or send what you enter. Our site loads fonts from Google, which may receive your IP address.</p>
 <h2>Text messages</h2><p>If we communicate with you by text message, you may reply STOP at any time to opt out. Mobile numbers and text opt-in data are never shared with third parties for marketing.</p>
 <h2>How we protect it</h2><p>We maintain physical, electronic and procedural safeguards, including secured systems and files and limited access to client information. If a security incident affects your information, we will notify you as required by law.</p>
 <h2>Your choices and questions</h2><p>To limit sharing where the law allows, or with any questions, email Jeff Nash at {FIRM['jeff_email']} or Denver McClure at {FIRM['denver_email']}.</p>

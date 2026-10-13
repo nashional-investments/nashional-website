@@ -23,14 +23,14 @@ jobs:
         with:
           python-version: "3.12"
       # Until launch this builds "staging" (blocked from search engines).
-      # At launch, change SITE_MODE to "prod".
+      # Live production build.
       - name: Build
         env:
-          SITE_MODE: staging
+          SITE_MODE: prod
         run: python3 src/build.py "$SITE_MODE"
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: out/staging
+          path: out/prod
   deploy:
     needs: build
     runs-on: ubuntu-latest
