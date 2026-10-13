@@ -27,6 +27,13 @@ FIRM = {
     "privacy_pdf": "",
 }
 
+# Contact form: Wix Forms in the free Wix Headless project "Nashional Investments Contact Form".
+# The client ID is a public identifier (safe in page source); it only mints anonymous visitor tokens.
+WIX_FORM = {
+    "client_id": "1c049085-1f93-4d33-9261-7721ec9823ca",
+    "form_id": "1ff6b33f-8694-4181-9cda-3b152b5f20fa",
+}
+
 def slug(s):
     s = s.lower().replace("&", "and").replace("%", "")
     return re.sub(r"[^a-z0-9]+", "-", s).strip("-")
@@ -794,8 +801,8 @@ def affiliates():
 def contact():
     body = (page_hero([("contact", "Contact")], "Contact", "Book a consultation.", "Your first conversation is complimentary. Tell us what is happening, or email Jeff or Denver directly, and we will reply promptly.", ctas=False)
             + band(f'''<div class="grid two">
-<form class="tool" id="contact-form" name="contact" method="POST" data-netlify="true" data-preview="{'1' if PREVIEW else '0'}" novalidate>
-<input type="hidden" name="form-name" value="contact">
+<form class="tool" id="contact-form" name="contact" method="POST" action="#" data-preview="{'1' if PREVIEW else '0'}" data-wix-client="{WIX_FORM['client_id']}" data-wix-form="{WIX_FORM['form_id']}" novalidate>
+<div aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden"><label for="c-website">Leave this field empty</label><input type="text" id="c-website" name="website" tabindex="-1" autocomplete="off"></div>
 <div class="fields">
 <div class="field"><label for="c-name">Name</label><input type="text" id="c-name" name="name" required autocomplete="name"></div>
 <div class="field"><label for="c-email">Email</label><input type="email" id="c-email" name="email" required autocomplete="email"></div>

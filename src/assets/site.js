@@ -191,10 +191,29 @@
     cf.addEventListener("submit", function (e) {
       var msg = document.getElementById("contact-status");
       if (!cf.checkValidity()) { e.preventDefault(); msg.textContent = "Please fill in your name, email and the reason for your call."; cf.reportValidity(); return; }
+      e.preventDefault();
       if (cf.getAttribute("data-preview") === "1") {
-        e.preventDefault();
         msg.textContent = "Preview only. At launch this form will send your request to Jeff and Denver by email.";
+        return;
       }
+      var fallback = "We could not send your request. Please email jeff@nashionalinvestments.com or dmcclure@nashionalinvestments.com directly.";
+      /* Honeypot: people never see this field, so anything in it came from a bot. Show success and send nothing. */
+      if (cf.elements.website && cf.elements.website.value) { cf.reset(); msg.textContent = "Thank you. Jeff or Denver will reply by email."; return; }
+      var btn = cf.querySelector("button[type=submit]");
+      var val = function (n) { var el = cf.elements[n]; return el ? String(el.value).trim() : ""; };
+      var data = { name: val("name"), email: val("email"), adviser: val("adviser"), topic: val("topic"), accredited: !!(cf.elements.accredited && cf.elements.accredited.checked) };
+      if (val("phone")) data.phone = val("phone");
+      if (val("message")) data.message = val("message");
+      var api = "https://www.wixapis.com";
+      btn.disabled = true; msg.textContent = "Sending...";
+      fetch(api + "/oauth2/token", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ clientId: cf.getAttribute("data-wix-client"), grantType: "anonymous" }) })
+        .then(function (r) { if (!r.ok) throw new Error("token " + r.status); return r.json(); })
+        .then(function (t) {
+          return fetch(api + "/form-submission-service/v4/submissions", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": t.access_token }, body: JSON.stringify({ submission: { formId: cf.getAttribute("data-wix-form"), submissions: data } }) });
+        })
+        .then(function (r) { if (!r.ok) throw new Error("submit " + r.status); cf.reset(); msg.textContent = "Thank you. Jeff or Denver will reply by email."; })
+        .catch(function () { msg.textContent = fallback; })
+        .then(function () { btn.disabled = false; });
     });
   }
 })();
