@@ -220,3 +220,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:none}
 .plain li{padding-left:14px;border-left:1px solid var(--line)}
 .headshot{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:4px;border:1px solid var(--line);filter:saturate(0.85)}
 table.wide{min-width:780px}
+
+/* Paper-band contrast overrides: components default to dark-ground colors, so re-map them on light bands. */
+.band.paper p,.band.paper li,.band.paper .faq .a,.band.paper .card p,.band.paper .ruled p,.band.paper .note p{color:var(--paper-muted)}
+.band.paper h2,.band.paper h3,.band.paper h4,.band.paper strong,.band.paper summary{color:var(--paper-fg)}
+.band.paper .card{background:#FFFFFF;border-color:var(--paper-line)}
+.band.paper .card .more{color:var(--paper-fg)}
+.band.paper .faq,.band.paper .faq details{border-color:var(--paper-line)}
+.band.paper .faq summary::after{color:var(--paper-muted)}
+.band.paper .eyebrow{color:var(--paper-accent)}
+.foot-cols .f-contact a{overflow-wrap:anywhere}

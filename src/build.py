@@ -113,7 +113,7 @@ def header(active):
 def footer():
     return f'''<footer class="site-footer"><div class="wrap">
 <div class="foot-cols">
-<div><a class="brand" href="{L('home')}"><b>NASHIONAL</b><span>INVESTMENTS</span></a><span>{FIRM['addr1']}<br>{FIRM['city']}, {FIRM['state']} {FIRM['zip']}</span><span>Jeff Nash · {FIRM['jeff_email']}<br>Denver McClure · {FIRM['denver_email']}</span></div>
+<div><a class="brand" href="{L('home')}"><b>NASHIONAL</b><span>INVESTMENTS</span></a><span>{FIRM['addr1'].replace(', ', '<br>')}<br>{FIRM['city']}, {FIRM['state']} {FIRM['zip']}</span><span class="f-contact">Jeff Nash<br><a href="mailto:{FIRM['jeff_email']}">{FIRM['jeff_email']}</a></span><span class="f-contact">Denver McClure<br><a href="mailto:{FIRM['denver_email']}">{FIRM['denver_email']}</a></span></div>
 <div><span class="label">Alternatives</span><a href="{L('dst')}">1031 Exchanges and DSTs</a><a href="{L('qoz')}">Opportunity Zones</a><a href="{L('energy')}">Energy</a><a href="{L('private')}">Private Markets</a><a href="{L('digital')}">Digital Assets</a></div>
 <div><span class="label">Planning</span><a href="{L('cbp')}">Cash Balance Plans</a><a href="{L('charitable')}">Charitable Giving</a><a href="{L('insurance')}">Insurance Planning</a><a href="{L('portfolio')}">Portfolio Management</a><a href="{L('fees')}">Fees</a></div>
 <div><a class="label" href="{L('serve')}" style="text-decoration:none">Who we serve</a><a href="{L('serve-re')}">Real Estate Investors</a><a href="{L('serve-biz')}">Business Owners</a><a href="{L('serve-md')}">Physicians</a></div>
@@ -609,7 +609,14 @@ def portfolio():
 # ---------------------------------------------------------------- WHO WE SERVE
 def serve(key, name, h1, lede, needs, strategies):
     items = "".join(f"<div><h3>{a}</h3><p>{b}</p></div>" for a, b in needs)
-    links = "".join(f'<article class="card"><div class="body"><h3>{n}</h3><a class="more" href="{L(k)}">Learn more</a></div></article>' for k, n in strategies)
+    blurbs = {"dst": "Defer the gain on a property sale by reinvesting in a professionally managed DST.",
+              "qoz": "Reinvest a capital gain in an Opportunity Zone fund for deferral and potential tax-free growth.",
+              "tool-boot": "Estimate how much you need to reinvest, and how much debt to replace, to defer fully.",
+              "cbp": "Large deductible retirement contributions for owners with high, steady income.",
+              "charitable": "Give appreciated assets and potentially avoid the capital gains tax.",
+              "energy": "Oil and gas programs whose drilling costs may be deductible in the first year.",
+              "portfolio": "Ongoing management of your public-market portfolio alongside your alternatives."}
+    links = "".join(f'<article class="card"><div class="body"><h3>{n}</h3><p>{blurbs.get(k, "")}</p><a class="more" href="{L(k)}">Learn more</a></div></article>' for k, n in strategies)
     return (page_hero([("serve", "Who We Serve"), (key, name)], "Who we serve", h1, lede)
             + band(head_block("What we hear", "The questions we help answer.") + f'<div class="ruled">{items}</div>')
             + band(head_block("Strategies to discuss", "Where we usually start.") + f'<div class="grid">{links}</div>', "paper")
