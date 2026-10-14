@@ -4,7 +4,7 @@
 python3 build.py preview  -> out/preview  (relative links ending in index.html, flags visible, noindex)
 python3 build.py prod     -> out/prod     (clean absolute links, indexable)
 """
-import html, json, os, re, shutil, sys
+import hashlib, html, json, os, re, shutil, sys
 from glossary import TERMS
 
 MODE = sys.argv[1] if len(sys.argv) > 1 else "preview"
@@ -15,6 +15,13 @@ OUT = os.path.join(ROOT, "..", "out", MODE)
 SITE = "https://www.nashionalinvestments.com"
 TODAY = "2026-10-13"
 FLAGS = []
+
+def asset_version(name):
+    """Short content hash for cache busting: the URL changes whenever the file does."""
+    with open(os.path.join(ROOT, "assets", name), "rb") as fh:
+        return hashlib.sha256(fh.read()).hexdigest()[:10]
+
+ASSET_V = {"css": asset_version("site.css"), "js": asset_version("site.js")}
 
 FIRM = {
     "legal": "Nashional Independent Investment Management LLC",
@@ -214,7 +221,7 @@ def render_all():
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@300;500;600;700&display=swap">
-<link rel="stylesheet" href="{base_prefix()}assets/site.css">
+<link rel="stylesheet" href="{base_prefix()}assets/site.css?v={ASSET_V['css']}">
 {''.join(jsonld(x) for x in lds)}
 </head>
 <body>
@@ -224,7 +231,7 @@ def render_all():
 {body}
 </main>
 {footer()}
-<script src="{base_prefix()}assets/site.js" defer></script>
+<script src="{base_prefix()}assets/site.js?v={ASSET_V['js']}" defer></script>
 </body>
 </html>
 '''
