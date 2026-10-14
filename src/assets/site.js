@@ -202,8 +202,17 @@
       var btn = cf.querySelector("button[type=submit]");
       var val = function (n) { var el = cf.elements[n]; return el ? String(el.value).trim() : ""; };
       var data = { name: val("name"), email: val("email"), adviser: val("adviser"), topic: val("topic"), accredited: !!(cf.elements.accredited && cf.elements.accredited.checked) };
-      if (val("phone")) data.phone = val("phone");
       if (val("message")) data.message = val("message");
+      /* Wix validates phone as E.164. Send it only when it normalizes cleanly; otherwise keep it in the message so the submission never fails on format. */
+      var rawPhone = val("phone");
+      if (rawPhone) {
+        var digits = rawPhone.replace(/\D/g, ""), e164 = "";
+        if (digits.length === 10) e164 = "+1" + digits;
+        else if (digits.length === 11 && digits.charAt(0) === "1") e164 = "+" + digits;
+        else if (rawPhone.charAt(0) === "+" && digits.length >= 8 && digits.length <= 15) e164 = "+" + digits;
+        if (e164) data.phone = e164;
+        else data.message = (data.message ? data.message + "\n" : "") + "Phone (as entered): " + rawPhone;
+      }
       var api = "https://www.wixapis.com";
       btn.disabled = true; msg.textContent = "Sending...";
       fetch(api + "/oauth2/token", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ clientId: cf.getAttribute("data-wix-client"), grantType: "anonymous" }) })

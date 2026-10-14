@@ -813,7 +813,7 @@ def contact():
 <div class="fields">
 <div class="field"><label for="c-name">Name</label><input type="text" id="c-name" name="name" required autocomplete="name"></div>
 <div class="field"><label for="c-email">Email</label><input type="email" id="c-email" name="email" required autocomplete="email"></div>
-<div class="field"><label for="c-phone">Phone (optional)</label><input type="tel" id="c-phone" name="phone" autocomplete="tel"></div>
+<div class="field"><label for="c-phone">Phone (optional)</label><input type="tel" id="c-phone" name="phone" autocomplete="tel" placeholder="(214) 555-0123"></div>
 <div class="field"><label for="c-who">Who would you like to speak with?</label><select id="c-who" name="adviser"><option>Either adviser</option><option>Jeff Nash</option><option>Denver McClure</option></select></div>
 <div class="field"><label for="c-topic">What is happening</label><select id="c-topic" name="topic" required><option value="">Choose one</option><option>Selling investment real estate</option><option>Selling a business</option><option>A large stock or crypto gain</option><option>High income, high tax bill</option><option>Portfolio management</option><option>Something else</option></select></div>
 </div>
