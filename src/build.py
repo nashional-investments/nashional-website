@@ -766,6 +766,24 @@ def glossary_index():
             + cta_band())
     return body, [ld]
 
+def gloss_desc(t, d):
+    tail = " Defined by Nashional Investments."
+    base = f"{t}: {d}"
+    if len(base) > 158:
+        return base[:155].rsplit(" ", 1)[0].rstrip(",;:") + "..."
+    return base + tail if len(base) < 120 and len(base + tail) <= 160 else base
+
+CAT_CONTEXT = {
+    "1031 and DST": "In a 1031 exchange, small details decide whether the full gain is deferred: the identification deadline, the value and debt you replace, and who holds the sale proceeds. The term {t} comes up when we review an exchange or a Delaware Statutory Trust offering with a client. We read the offering memorandum, check the sponsor's track record and fees, and confirm the replacement fits the exchange rules before anything closes.",
+    "Opportunity Zones": "Opportunity Zone rules turn on timing: when the gain was realized, when it is reinvested, and how long the fund investment is held. Understanding {t} matters because it can affect how much gain is deferred or excluded. The rules for investments made from January 1, 2027 differ from the original program, so we check which regime applies before recommending a Qualified Opportunity Fund.",
+    "Energy": "Energy programs can produce large first-year deductions, but they are speculative and illiquid, and the tax result depends on how the interest is held. The term {t} is part of how we evaluate an oil and gas program, alongside the operator's history, the well costs and how the deduction fits the rest of your tax picture. We coordinate the details with your CPA.",
+    "Private Markets": "Private investments trade daily liquidity for access to strategies that public markets do not offer, and most are limited to accredited investors. The term {t} is one of the concepts we explain when reviewing a private credit, private equity or interval fund, along with fees, lockups and how much of a portfolio belongs in investments you cannot easily sell.",
+    "Tax": "Tax strategy is usually about timing and structure: when income is recognized, where it is deducted and how gains are taxed. The term {t} names one of the tools or rules we look at with your CPA when building a plan. The right answer depends on your income, your assets and your goals, so we model the options before you act.",
+    "Digital Assets": "Digital assets raise questions that traditional investments do not, from custody and private keys to volatility and tax reporting. The term {t} is part of how we explain the asset class to clients who want exposure. We advise on how digital assets fit within a diversified portfolio and how they are held, with the risks stated plainly.",
+    "Regulatory": "Investment advisers are regulated to protect clients, and knowing how the rules work helps you judge the advice you receive. The term {t} relates to how advisers such as Nashional Investments are registered and supervised. You can review our registration, Form ADV and disclosures at any time.",
+    "Insurance": "Insurance can protect a plan or fund part of it, but permanent policies are complex and carry ongoing costs. The term {t} is one we explain when reviewing an existing or proposed policy. Insurance products are offered through our affiliate, Nashional Insurance, and you are never required to buy through it.",
+}
+
 def term_page(t, c, d):
     key = "term:" + slug(t)
     related = [x for x in TERMS if x[1] == c and x[0] != t][:4]
@@ -774,16 +792,20 @@ def term_page(t, c, d):
     sname = {"dst": "1031 exchanges and DSTs", "qoz": "Opportunity Zones", "energy": "Energy", "private": "Private markets", "tax": "Tax strategies", "digital": "Digital assets", "disclosures": "Our disclosures", "insurance": "Insurance planning"}[strat]
     ld = {"@context": "https://schema.org", "@type": "DefinedTerm", "name": t, "description": d, "url": SITE + "/glossary/" + slug(t) + "/",
           "inDefinedTermSet": SITE + "/glossary/#set"}
+    fq, fq_ld = faq([(f"What does the term {t} mean?", d),
+                     (f"Why does {t} matter for investors?", ". ".join(CAT_CONTEXT[c].format(t=t).split(". ")[:2]) + ".")])
+    ctx_html = f'<div class="prose" style="max-width:46em"><h2>In practice</h2><p>{CAT_CONTEXT[c].format(t=t)}</p></div>'
     extra = ""
     if t == "Accredited Investor":
         extra = band(accredited_card(), "paper")
     body = (f'''<section class="hero page-hero"><div class="wrap">{crumbs([("glossary", "Glossary"), (key, t)])}<span class="eyebrow">Definition · {c}</span><h1>{t}</h1><p class="definition">{d}</p>
 <p class="label">Nashional Investments · Updated October 2026</p><p class="risk" style="font-size:13px">Educational definition only, not investment, tax or legal advice.</p></div></section>'''
             + extra
+            + band(ctx_html + '<div style="height:64px"></div>' + head_block("Questions", "Common questions.") + fq)
             + band(f'''<div class="grid two"><div style="display:flex;flex-direction:column;gap:14px;min-width:0"><span class="eyebrow">Related terms</span><div class="chips">{rel}</div><p><a href="{L('glossary')}">All terms</a></p></div>
 <div class="note"><span class="eyebrow">Where it applies</span><p>See how this fits into a real plan on our <a href="{L(strat)}">{sname}</a> page.</p></div></div>''')
             + cta_band("Have a question about this?", "Ask us how it applies to your situation. Your first conversation is complimentary."))
-    return body, [ld]
+    return body, [ld, fq_ld]
 
 # ---------------------------------------------------------------- DISCLOSURES / AFFILIATES / CONTACT
 def disclosures():
@@ -891,18 +913,18 @@ def build():
     os.makedirs(OUT)
     reg("home", "Nashional Investments | DST and Opportunity Zone Advisor",
         "Texas-registered fiduciary advisor for 1031 exchanges, DSTs, Opportunity Zones and tax-driven alternatives. Led by a CFP® and CPA. Flat, disclosed fees.", lambda: (home(), [HOME_FAQ[1]]))
-    reg("alternatives", "Alternative Investment Advisor", "Fiduciary review of DSTs, Opportunity Zone funds, energy programs and private funds for accredited investors.", lambda: (alternatives(), []), "alternatives")
-    reg("dst", "DST 1031 Exchange Advisor in Texas", "How 1031 exchanges into Delaware Statutory Trusts work, their trade-offs, and how a fiduciary evaluates a DST.", dst, "alternatives")
-    reg("qoz", "Opportunity Zone Investing: 2026 and 2027 Rules", "How Qualified Opportunity Fund investing works under the current rules and the new rules starting January 1, 2027.", qoz, "alternatives")
-    reg("energy", "Oil and Gas Tax Strategies", "How oil and gas working interests and intangible drilling cost deductions work, and their risks.", energy, "alternatives")
-    reg("private", "Private Credit and Private Equity Advisor", "Fiduciary review of private credit, private equity and interval funds for accredited investors.", private, "alternatives")
-    reg("digital", "Digital Asset Financial Advisor in Texas", "Advice on how Bitcoin and other digital assets fit within a diversified portfolio, from a CBDA-designated adviser.", digital, "alternatives")
-    reg("tax", "Tax Strategies for High-Income Investors", "Cash balance plans, charitable strategies, energy deductions and gain deferral, coordinated by a CPA-led adviser.", tax, "tax")
-    reg("cbp", "Cash Balance Plans for Business Owners", "How cash balance plans allow large deductible retirement contributions for owners, partners and professionals.", cbp, "tax")
-    reg("charitable", "Charitable Giving with Appreciated Assets", "Donor-advised funds and charitable remainder trusts for appreciated stock, real estate and digital assets.", charitable, "tax")
-    reg("portfolio", "Portfolio Management", "Tax-aware discretionary portfolio management coordinated with your alternative investments.", portfolio, "portfolio")
+    reg("alternatives", "Alternative Investment Advisor", "Fiduciary review of DSTs, Opportunity Zone funds, energy programs and private funds for accredited investors, compared on tax, hold period and liquidity.", lambda: (alternatives(), []), "alternatives")
+    reg("dst", "DST 1031 Exchange Advisor in Texas", "How 1031 exchanges into Delaware Statutory Trusts work, the deadlines and debt rules, their trade-offs, and how a fiduciary evaluates a DST sponsor.", dst, "alternatives")
+    reg("qoz", "Opportunity Zone Investing: 2026 and 2027 Rules", "How Qualified Opportunity Fund investing works: the 180-day window, the 10-year exclusion, and the new rules for investments from January 1, 2027.", qoz, "alternatives")
+    reg("energy", "Oil and Gas Tax Strategies", "How oil and gas working interests and intangible drilling cost deductions can offset active income, who they suit, and the risks to weigh.", energy, "alternatives")
+    reg("private", "Private Credit and Private Equity Advisor", "Fiduciary review of private credit, private equity and interval funds for accredited investors, including liquidity limits, fees and portfolio fit.", private, "alternatives")
+    reg("digital", "Digital Asset Financial Advisor in Texas", "How Bitcoin and other digital assets can fit a diversified portfolio, including custody, sizing and risks, from a CBDA-designated adviser in Texas.", digital, "alternatives")
+    reg("tax", "Tax Strategies for High-Income Investors", "Tax strategies for high earners and business owners: cash balance plans, charitable giving, energy deductions and gain deferral from a CPA-led adviser.", tax, "tax")
+    reg("cbp", "Cash Balance Plans for Business Owners", "How cash balance plans allow large deductible retirement contributions for business owners, partners and physicians, with limits and plan costs.", cbp, "tax")
+    reg("charitable", "Charitable Giving with Appreciated Assets", "How donor-advised funds and charitable remainder trusts let you give appreciated stock, real estate or digital assets and generally avoid capital gains tax.", charitable, "tax")
+    reg("portfolio", "Portfolio Management", "Tax-aware discretionary portfolio management from a CFP and CPA-led fiduciary, coordinated with your DSTs, Opportunity Zone funds and other alternatives.", portfolio, "portfolio")
     reg("serve", "Who We Serve", "Nashional Investments works with accredited investors, high-net-worth families, real estate investors, business owners and physicians.", serve_hub)
-    reg("serve-re", "Selling Rental Property: Capital Gains Options", "Options for real estate investors selling investment property, from 1031 exchanges and DSTs to Opportunity Zones.",
+    reg("serve-re", "Selling Rental Property: Capital Gains Options", "Options for real estate investors selling investment property: 1031 exchanges into DSTs, Opportunity Zone funds, and deferring gains and recapture.",
         lambda: serve("serve-re", "Real Estate Investors", "Selling investment property without giving up the gain.", "You have built equity in real estate. We help you decide what to do with it when you sell.",
                       [("Do I have to keep being a landlord?", "A 1031 exchange into a DST lets you defer the gain while a professional sponsor manages the property."), ("Can I defer depreciation recapture?", "Yes. A 1031 exchange can defer recapture along with the capital gain."), ("What if I want out of real estate?", "An Opportunity Zone fund can take just the gain, freeing the rest.")],
                       [("dst", "1031 exchanges and DSTs"), ("qoz", "Opportunity Zones"), ("tool-boot", "1031 replacement calculator")]))
@@ -910,7 +932,7 @@ def build():
         lambda: serve("serve-biz", "Business Owners", "Plan the sale of your business before the buyer does.", "For many owners, the largest tax bill of their lives arrives with the exit. Planning a year ahead can change what you keep.",
                       [("How much of my sale will go to tax?", "We model the gain, the rates and the options before you sign a letter of intent."), ("Can I defer the gain?", "An Opportunity Zone fund or an installment sale can spread or defer it."), ("What about the years before the sale?", "A cash balance plan can shelter large contributions while you still own the business.")],
                       [("qoz", "Opportunity Zones"), ("cbp", "Cash balance plans"), ("charitable", "Charitable giving")]))
-    reg("serve-md", "Financial Advisor for Physicians in Texas", "Tax and investment strategies for physicians and dentists, including cash balance plans and energy deductions.",
+    reg("serve-md", "Financial Advisor for Physicians in Texas", "Tax and investment strategies for physicians and dentists in Texas, including cash balance plans for practice owners, energy deductions and passive real estate.",
         lambda: serve("serve-md", "Physicians", "For physicians and dentists with a high income and a high tax bill.", "Many physicians start earning later than their peers and pay the top tax rate for most of their careers. We focus on the strategies that typically matter most for practice owners and high earners.",
                       [("How do I lower my taxes?", "Practice owners can often use a cash balance plan. Employed physicians usually look first at energy deductions and charitable strategies, since retirement plan options depend on the employer."), ("Should I invest in real estate?", "Passive real estate, such as DSTs and private real estate funds, can add income without becoming a landlord."), ("How do I coordinate all of this?", "One plan that covers your practice, your portfolio and your taxes.")],
                       [("cbp", "Cash balance plans"), ("energy", "Energy"), ("portfolio", "Portfolio management")]))
@@ -922,22 +944,22 @@ def build():
                        ("Do I need to change jobs or start a business to save on taxes?", "No. Many of the strategies we discuss work alongside a salary. Side business income can open more options, such as a solo 401(k), but it is not required."),
                        ("How much income makes this worth a conversation?", "Most clients in this group are accredited investors, typically with income above $200,000 ($300,000 with a spouse or partner). Strategy fit matters more than any single number."),
                        ("Do you replace my CPA?", "No. We work with your CPA, who prepares your return. We bring the investment side of the plan.")]))
-    reg("fees", "Fees", "Our advisory fees for portfolio management, alternatives, 1031 and DST consulting, and hourly advice.", fees, "fees")
+    reg("fees", "Fees", "Nashional Investments fees: portfolio management rates, flat fees for alternatives and 1031 or DST consulting, group retirement plans and hourly advice.", fees, "fees")
     reg("team", "Team", "Meet Jeff Nash, CFP®, CPA, founder and CIO, and Denver McClure, CBDA, partner and alternatives lead at Nashional Investments in McKinney, Texas.", team, "team")
     reg("tools", "Planning Tools", "Free, private calculators: 1031 exchange deadlines, 1031 replacement and boot, Opportunity Zone timing and an accredited investor check.", tools, "tools")
-    reg("tool-1031", "1031 Exchange Deadline Calculator", "Calculate your 45-day identification and 180-day closing deadlines for a 1031 exchange.", tool_1031, "tools")
-    reg("tool-boot", "1031 Exchange Replacement and Boot Calculator", "Calculate the value, equity and debt to replace in a 1031 exchange, and estimate boot.", tool_boot, "tools")
-    reg("tool-qoz", "Opportunity Zone Timing Checker", "Find your 180-day Opportunity Zone investment window and whether the 2027 rules apply.", tool_qoz, "tools")
-    reg("tool-ai", "Accredited Investor Check", "Check whether you likely meet the SEC accredited investor definition. Private and free.", tool_ai, "tools")
-    reg("glossary", "Glossary", "Plain-English definitions of 1031, Opportunity Zone, energy, private market, tax and digital asset terms.", glossary_index, "glossary")
+    reg("tool-1031", "1031 Exchange Deadline Calculator", "Free 1031 exchange deadline calculator: find your 45-day identification and 180-day closing dates from your sale date, including the tax return rule.", tool_1031, "tools")
+    reg("tool-boot", "1031 Exchange Replacement and Boot Calculator", "Free 1031 replacement calculator: see the value, equity and debt you must replace to defer fully, and estimate taxable boot before you identify.", tool_boot, "tools")
+    reg("tool-qoz", "Opportunity Zone Timing Checker", "Find your 180-day Opportunity Zone investment window from your gain date, and see whether the current rules or the new 2027 rules would apply.", tool_qoz, "tools")
+    reg("tool-ai", "Accredited Investor Check", "Check whether you likely meet the SEC accredited investor definition by income, net worth or license. Private and free; nothing you enter is stored.", tool_ai, "tools")
+    reg("glossary", "Glossary", "Plain-English definitions of more than 60 terms used in 1031 exchanges, DSTs, Opportunity Zones, energy, private markets, tax planning and digital assets.", glossary_index, "glossary")
     for t, c, d in TERMS:
-        reg("term:" + slug(t), f"{t}: Definition", (d if len(d) <= 158 else d[:155].rsplit(" ", 1)[0].rstrip(",;:") + "..."), (lambda t=t, c=c, d=d: term_page(t, c, d)), "glossary")
+        reg("term:" + slug(t), f"{t}: Definition", gloss_desc(t, d), (lambda t=t, c=c, d=d: term_page(t, c, d)), "glossary")
     reg("insurance", "Insurance Planning", "Cash value life insurance, indexed universal life and business coverage, offered through our affiliate Nashional Insurance.", insurance, "tax")
-    reg("privacy", "Privacy Policy", "How Nashional Investments collects, uses and protects your personal information.", privacy)
+    reg("privacy", "Privacy Policy", "How Nashional Investments collects, uses, shares and protects your personal information, including affiliate sharing, your choices and how to reach us.", privacy)
     reg("notfound", "Page Not Found", "The page you were looking for has moved. Explore DSTs, Opportunity Zones and tax-driven alternatives from Nashional Investments.", lambda: (page_hero([("notfound", "Page not found")], "404", "This page has moved.", "The page you were looking for is no longer here. Try our alternatives, planning tools or glossary.", ctas=False) + band(f'<div class="btns"><a class="btn" href="{L("home")}">Go to the homepage</a><a class="btn ghost" href="{L("alternatives")}">Alternatives</a><a class="btn ghost" href="{L("glossary")}">Glossary</a></div>'), []))
     reg("disclosures", "Disclosures", "Registration, investment risk, private offering, conflict of interest and technology disclosures for Nashional Investments, a Texas-registered adviser.", disclosures)
-    reg("affiliates", "Affiliated Companies", "Affiliated tax, insurance and loan advisory firms, and the conflicts of interest they create.", affiliates)
-    reg("contact", "Contact", "Book a complimentary consultation with Nashional Investments in McKinney, Texas.", contact)
+    reg("affiliates", "Affiliated Companies", "Nashional Investments' affiliated tax, insurance and loan advisory firms, how each is paid, and the conflicts of interest they create for clients.", affiliates)
+    reg("contact", "Contact", "Book a complimentary consultation with Jeff Nash or Denver McClure at Nashional Investments in McKinney, Texas, about DSTs, Opportunity Zones or taxes.", contact)
     FLAGS.clear()
     render_all()
     shutil.copytree(os.path.join(ROOT, "assets"), os.path.join(OUT, "assets"))
