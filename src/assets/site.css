@@ -230,3 +230,4 @@ table.wide{min-width:780px}
 .band.paper .faq summary::after{color:var(--paper-muted)}
 .band.paper .eyebrow{color:var(--paper-accent)}
 .foot-cols .f-contact a{overflow-wrap:anywhere}
+@media (min-width:1000px){.foot-cols{grid-template-columns:1.7fr repeat(5,1fr)}.foot-cols .f-contact a{overflow-wrap:normal}}

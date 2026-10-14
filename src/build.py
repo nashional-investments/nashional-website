@@ -51,7 +51,7 @@ PAGES = {
     "private": "alternatives/private-markets/", "digital": "alternatives/digital-assets/",
     "tax": "tax-strategies/", "cbp": "tax-strategies/cash-balance-plans/", "charitable": "tax-strategies/charitable-giving/",
     "portfolio": "portfolio-management/",
-    "serve": "who-we-serve/", "serve-re": "who-we-serve/real-estate-investors/", "serve-biz": "who-we-serve/business-owners/", "serve-md": "who-we-serve/physicians/",
+    "serve": "who-we-serve/", "serve-re": "who-we-serve/real-estate-investors/", "serve-biz": "who-we-serve/business-owners/", "serve-md": "who-we-serve/physicians/", "serve-hi": "who-we-serve/high-income-earners/",
     "fees": "fees/", "team": "team/", "tools": "tools/",
     "tool-1031": "tools/1031-deadline-calculator/", "tool-boot": "tools/1031-replacement-calculator/",
     "tool-qoz": "tools/opportunity-zone-timing/", "tool-ai": "tools/accredited-investor-check/",
@@ -123,7 +123,7 @@ def footer():
 <div><a class="brand" href="{L('home')}"><b>NASHIONAL</b><span>INVESTMENTS</span></a><span>{FIRM['addr1'].replace(', ', '<br>')}<br>{FIRM['city']}, {FIRM['state']} {FIRM['zip']}</span><span class="f-contact">Jeff Nash<br><a href="mailto:{FIRM['jeff_email']}">{FIRM['jeff_email']}</a></span><span class="f-contact">Denver McClure<br><a href="mailto:{FIRM['denver_email']}">{FIRM['denver_email']}</a></span></div>
 <div><span class="label">Alternatives</span><a href="{L('dst')}">1031 Exchanges and DSTs</a><a href="{L('qoz')}">Opportunity Zones</a><a href="{L('energy')}">Energy</a><a href="{L('private')}">Private Markets</a><a href="{L('digital')}">Digital Assets</a></div>
 <div><span class="label">Planning</span><a href="{L('cbp')}">Cash Balance Plans</a><a href="{L('charitable')}">Charitable Giving</a><a href="{L('insurance')}">Insurance Planning</a><a href="{L('portfolio')}">Portfolio Management</a><a href="{L('fees')}">Fees</a></div>
-<div><a class="label" href="{L('serve')}" style="text-decoration:none">Who we serve</a><a href="{L('serve-re')}">Real Estate Investors</a><a href="{L('serve-biz')}">Business Owners</a><a href="{L('serve-md')}">Physicians</a></div>
+<div><a class="label" href="{L('serve')}" style="text-decoration:none">Who we serve</a><a href="{L('serve-re')}">Real Estate Investors</a><a href="{L('serve-biz')}">Business Owners</a><a href="{L('serve-hi')}">High-Income Earners</a><a href="{L('serve-md')}">Physicians</a></div>
 <div><span class="label">Firm</span><a href="{L('team')}">Team</a><a href="{L('tools')}">Tools</a><a href="{L('glossary')}">Glossary</a><a href="{L('affiliates')}">Affiliated Companies</a><a href="{L('disclosures')}">Disclosures</a><a href="{L('privacy')}">Privacy Policy</a><a href="{L('contact')}">Contact</a></div>
 </div>
 <div class="legal">
@@ -591,7 +591,7 @@ def cbp():
 
 def charitable():
     body = (page_hero([("tax", "Tax Strategies"), ("charitable", "Charitable Giving")], "Charitable giving", "Give more effectively with appreciated assets.",
-                      "Donating appreciated stock, real estate or digital assets instead of cash can avoid capital gains tax on the appreciation and increase what reaches the causes you support.")
+                      "Donating appreciated stock, real estate or digital assets instead of cash can generally avoid capital gains tax on the appreciation and increase what reaches the causes you support.")
             + band(f'''<div class="grid two">
 <article class="card"><div class="body"><h3>{T('Donor-Advised Fund')}</h3><p>Take the deduction in a high-income year, then recommend grants to charities over time.</p></div></article>
 <article class="card"><div class="body"><h3>{T('Charitable Remainder Trust')}</h3><p>Contribute an appreciated asset, receive income for a term, and leave the remainder to charity, spreading the gain over years.</p></div></article>
@@ -614,25 +614,29 @@ def portfolio():
     return body, []
 
 # ---------------------------------------------------------------- WHO WE SERVE
-def serve(key, name, h1, lede, needs, strategies):
+def serve(key, name, h1, lede, needs, strategies, faqs=None):
     items = "".join(f"<div><h3>{a}</h3><p>{b}</p></div>" for a, b in needs)
     blurbs = {"dst": "Defer the gain on a property sale by reinvesting in a professionally managed DST.",
-              "qoz": "Reinvest a capital gain in an Opportunity Zone fund for deferral and potential tax-free growth.",
+              "qoz": "Reinvest a capital gain in an Opportunity Zone fund to defer the tax and, after 10 years, potentially exclude the fund's appreciation.",
               "tool-boot": "Estimate how much you need to reinvest, and how much debt to replace, to defer fully.",
               "cbp": "Large deductible retirement contributions for owners with high, steady income.",
               "charitable": "Give appreciated assets and potentially avoid the capital gains tax.",
               "energy": "Oil and gas programs whose drilling costs may be deductible in the first year.",
-              "portfolio": "Ongoing management of your public-market portfolio alongside your alternatives."}
+              "portfolio": "Ongoing management of your public-market portfolio alongside your alternatives.",
+              "tax": "How the strategies fit together with your CPA's plan for the year."}
+    fq_html, fq_ld = faq(faqs) if faqs else ("", None)
     links = "".join(f'<article class="card"><div class="body"><h3>{n}</h3><p>{blurbs.get(k, "")}</p><a class="more" href="{L(k)}">Learn more</a></div></article>' for k, n in strategies)
     return (page_hero([("serve", "Who We Serve"), (key, name)], "Who we serve", h1, lede)
             + band(head_block("What we hear", "The questions we help answer.") + f'<div class="ruled">{items}</div>')
             + band(head_block("Strategies to discuss", "Where we usually start.") + f'<div class="grid">{links}</div>', "paper")
-            + cta_band(*(SELL if key in ("serve-re", "serve-biz") else ()))), []
+            + (band(head_block("Questions", "Common questions.") + fq_html) if faqs else "")
+            + cta_band(*(SELL if key in ("serve-re", "serve-biz") else ()))), ([fq_ld] if faqs else [])
 
 def serve_hub():
     tiles = [("serve-re", "Real estate investors", "Selling investment property and deciding between a 1031 exchange, a DST or an Opportunity Zone fund."),
              ("serve-biz", "Business owners", "Planning an exit, deferring the gain and using the years before a sale well."),
-             ("serve-md", "Physicians and dentists", "High income, a high tax bill and too little time to coordinate it all.")]
+             ("serve-md", "Physicians and dentists", "High income, a high tax bill and too little time to coordinate it all."),
+             ("serve-hi", "High-income earners", "Executives and W-2 professionals in the top bracket looking for the levers that still work.")]
     cards = "".join(f'<article class="card"><div class="body"><h3>{n}</h3><p>{d}</p><a class="more" href="{L(k)}">Learn more</a></div></article>' for k, n, d in tiles)
     body = (page_hero([("serve", "Who We Serve")], "Who we serve", "Built for accredited investors and high-net-worth families.",
                       f"Our alternative strategies are available only to {T('Accredited Investor', 'accredited investors')}. These are the clients we most often work with.")
@@ -673,7 +677,7 @@ def team():
          "alumniOf": [{"@type": "CollegeOrUniversity", "name": "Midwestern State University"}],
          "sameAs": [FIRM["iapd_denver"]]},
     ]
-    body = (page_hero([("team", "Team")], "Team", "Two advisers. One plan.", "Tax and investment strategy from a CFP® professional and CPA, and real estate and alternatives expertise from a partner who invests alongside the asset classes he advises on.")
+    body = (page_hero([("team", "Team")], "Team", "Two advisers. One plan.", "Tax and investment strategy from a CFP® professional and CPA, and real estate and alternatives experience from a partner who invests alongside the asset classes he advises on.")
             + band(team_cards())
             + cta_band())
     return body, persons
@@ -900,7 +904,7 @@ def build():
     reg("serve", "Who We Serve", "Nashional Investments works with accredited investors, high-net-worth families, real estate investors, business owners and physicians.", serve_hub)
     reg("serve-re", "Selling Rental Property: Capital Gains Options", "Options for real estate investors selling investment property, from 1031 exchanges and DSTs to Opportunity Zones.",
         lambda: serve("serve-re", "Real Estate Investors", "Selling investment property without giving up the gain.", "You have built equity in real estate. We help you decide what to do with it when you sell.",
-                      [("Do I have to keep being a landlord?", "A 1031 exchange into a DST lets you defer the gain while a professional sponsor manages the property."), ("How do I avoid depreciation recapture?", "A 1031 exchange can defer recapture along with the capital gain."), ("What if I want out of real estate?", "An Opportunity Zone fund can take just the gain, freeing the rest.")],
+                      [("Do I have to keep being a landlord?", "A 1031 exchange into a DST lets you defer the gain while a professional sponsor manages the property."), ("Can I defer depreciation recapture?", "Yes. A 1031 exchange can defer recapture along with the capital gain."), ("What if I want out of real estate?", "An Opportunity Zone fund can take just the gain, freeing the rest.")],
                       [("dst", "1031 exchanges and DSTs"), ("qoz", "Opportunity Zones"), ("tool-boot", "1031 replacement calculator")]))
     reg("serve-biz", "Selling a Business: Tax Strategies", "Tax strategies for business owners planning a sale, including Opportunity Zones, installment sales and charitable trusts.",
         lambda: serve("serve-biz", "Business Owners", "Plan the sale of your business before the buyer does.", "For many owners, the largest tax bill of their lives arrives with the exit. Planning a year ahead can change what you keep.",
@@ -908,8 +912,16 @@ def build():
                       [("qoz", "Opportunity Zones"), ("cbp", "Cash balance plans"), ("charitable", "Charitable giving")]))
     reg("serve-md", "Financial Advisor for Physicians in Texas", "Tax and investment strategies for physicians and dentists, including cash balance plans and energy deductions.",
         lambda: serve("serve-md", "Physicians", "For physicians and dentists with a high income and a high tax bill.", "Many physicians start earning later than their peers and pay the top tax rate for most of their careers. We focus on the strategies that typically matter most for practice owners and high earners.",
-                      [("How do I lower my taxes as a W-2 or practice owner?", "Cash balance plans and energy deductions are two of the most common levers."), ("Should I invest in real estate?", "Passive real estate, such as DSTs and private real estate funds, can add income without becoming a landlord."), ("How do I coordinate all of this?", "One plan that covers your practice, your portfolio and your taxes.")],
+                      [("How do I lower my taxes?", "Practice owners can often use a cash balance plan. Employed physicians usually look first at energy deductions and charitable strategies, since retirement plan options depend on the employer."), ("Should I invest in real estate?", "Passive real estate, such as DSTs and private real estate funds, can add income without becoming a landlord."), ("How do I coordinate all of this?", "One plan that covers your practice, your portfolio and your taxes.")],
                       [("cbp", "Cash balance plans"), ("energy", "Energy"), ("portfolio", "Portfolio management")]))
+    reg("serve-hi", "Tax Strategies for High-Income W-2 Earners", "Tax strategies for executives and high-income W-2 earners in Texas, including energy deductions, charitable giving and equity compensation planning.",
+        lambda: serve("serve-hi", "High-Income Earners", "For W-2 earners in the top tax bracket.", "A large salary leaves fewer tax levers than business income does. We focus on the ones that still work for employees, and coordinate them with your CPA.",
+                      [("What can a W-2 employee actually deduct?", "Fewer things than a business owner. The main levers are workplace retirement plans, charitable giving and, for some accredited investors, energy working interests."), ("I have stock options or RSUs. Now what?", "We plan the timing of exercises and sales, concentration risk and the tax on vesting before it lands."), ("I have a large gain from selling stock.", "An Opportunity Zone fund can defer a capital gain from almost any source, including public stock.")],
+                      [("energy", "Energy"), ("charitable", "Charitable giving"), ("qoz", "Opportunity Zones")],
+                      [("Can energy investments offset W-2 income?", "Intangible drilling costs from a working interest held directly, not through a liability-limiting entity, can generally be deducted against active income such as wages. These programs are speculative, illiquid and only for accredited investors."),
+                       ("Do I need to change jobs or start a business to save on taxes?", "No. Many of the strategies we discuss work alongside a salary. Side business income can open more options, such as a solo 401(k), but it is not required."),
+                       ("How much income makes this worth a conversation?", "Most clients in this group are accredited investors, typically with income above $200,000 ($300,000 with a spouse or partner). Strategy fit matters more than any single number."),
+                       ("Do you replace my CPA?", "No. We work with your CPA, who prepares your return. We bring the investment side of the plan.")]))
     reg("fees", "Fees", "Our advisory fees for portfolio management, alternatives, 1031 and DST consulting, and hourly advice.", fees, "fees")
     reg("team", "Team", "Meet Jeff Nash, CFP®, CPA, founder and CIO, and Denver McClure, CBDA, partner and alternatives lead at Nashional Investments in McKinney, Texas.", team, "team")
     reg("tools", "Planning Tools", "Free, private calculators: 1031 exchange deadlines, 1031 replacement and boot, Opportunity Zone timing and an accredited investor check.", tools, "tools")
@@ -965,6 +977,12 @@ def write_extras():
 - [1031 replacement calculator]({SITE}/tools/1031-replacement-calculator/)
 - [Opportunity Zone timing checker]({SITE}/tools/opportunity-zone-timing/)
 - [Accredited investor check]({SITE}/tools/accredited-investor-check/)
+
+## Who we serve
+- [Real estate investors](https://www.nashionalinvestments.com/who-we-serve/real-estate-investors/): selling investment property, 1031 exchanges, DSTs and Opportunity Zones.
+- [Business owners](https://www.nashionalinvestments.com/who-we-serve/business-owners/): planning a business sale, deferring the gain, cash balance plans.
+- [Physicians and dentists](https://www.nashionalinvestments.com/who-we-serve/physicians/): high income, cash balance plans and energy deductions.
+- [High-income W-2 earners](https://www.nashionalinvestments.com/who-we-serve/high-income-earners/): executives and employees in the top bracket, energy working interests, charitable giving, equity compensation and Opportunity Zones.
 
 ## Firm
 - [Fees]({SITE}/fees/): 0.75% on the first $499,999 and 0.50% above $500,000 for portfolio management; a one-time flat fee by investment size for alternative assets; 0.25% for group retirement plans; $475 an hour for advice. No advisory fee for insurance, which is offered through the separate affiliate Nashional Insurance.
