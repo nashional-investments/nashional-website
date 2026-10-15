@@ -174,6 +174,19 @@ def risk(text):
 
 PAGES_OUT = {}
 
+def fix_headings(doc):
+    # Insert a visually hidden h2 where a page jumps from h1 straight to h3 (card grids), for screen readers and crawlers.
+    m = re.search(r"</h1>", doc)
+    if not m:
+        return doc
+    nxt = re.search(r"<h([2-6])[ >]", doc[m.end():])
+    if nxt and nxt.group(1) == "3":
+        i = m.end() + nxt.start()
+        j = doc.rfind('<section class="band', 0, i)
+        j = doc.find('<div class="wrap">', j) + len('<div class="wrap">') if j != -1 else i
+        doc = doc[:j] + '<h2 class="sr-only">On this page</h2>' + doc[j:]
+    return doc
+
 def page(key, title, desc, body, schema=None, active=None):
     path = PAGES[key]
     CURRENT["dir"] = path
@@ -238,7 +251,7 @@ def render_all():
         dest = os.path.join(OUT, path, "index.html")
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         with open(dest, "w") as f:
-            f.write(doc)
+            f.write(fix_headings(doc))
 
 
 def art(kind):
@@ -386,7 +399,7 @@ def team_cards(short=False):
          "short": "Denver leads the firm's real estate and alternatives practice. A Marine Corps veteran and active DFW real estate investor, he brings an owner's perspective to every 1031 exchange, DST and Opportunity Zone decision.",
          "long": ["Denver McClure is a Partner at Nashional Investments, where he leads the firm's real estate and alternative investment practice, including 1031 exchanges, DSTs, Opportunity Zone funds and digital assets. He is a United States Marine Corps veteran and an Investment Adviser Representative.",
                   "Denver owns multiple investment properties across Dallas-Fort Worth and has worked through acquisitions, refinances, renovations and long-term holds as an owner himself. When a client is deciding whether to sell, exchange or hold, he has been on that side of the table.",
-                  "He holds the Certified in Blockchain and Digital Assets (CBDA) designation from the Digital Assets Council of Financial Professionals and leads the firm's digital asset advice. Denver co-founded Fiduciary Financing with Jeff Nash and is Managing Partner of Christian Brothers Roofing, a veteran-owned exterior contractor serving Dallas-Fort Worth since 1983. He is based in Lewisville, Texas."],
+                  "He holds the Certified in Blockchain and Digital Assets (CBDA) designation from the Digital Assets Council of Financial Professionals and leads the firm's digital asset advice. Denver co-founded Fiduciary Financing with Jeff Nash and is Managing Partner of Christian Brothers Roofing, a veteran-owned exterior contractor serving Dallas-Fort Worth since 1983. He is based in Flower Mound, Texas."],
          "creds": ["Investment Adviser Representative, Series 65", "Certified in Blockchain and Digital Assets (CBDA), DACFP", "General Lines Agent, life insurance and annuities"],
          "edu": ["BBA, Management, Midwestern State University"]},
     ]

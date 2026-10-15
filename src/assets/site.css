@@ -231,3 +231,4 @@ table.wide{min-width:780px}
 .band.paper .eyebrow{color:var(--paper-accent)}
 .foot-cols .f-contact a{overflow-wrap:anywhere}
 @media (min-width:1000px){.foot-cols{grid-template-columns:1.7fr repeat(5,1fr)}.foot-cols .f-contact a{overflow-wrap:normal}}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
