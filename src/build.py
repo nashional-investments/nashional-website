@@ -293,7 +293,7 @@ def home():
 <section class="hero"><canvas id="contours" aria-hidden="true"></canvas><div class="wrap">
 <a class="badge" href="{L('term:accredited-investor')}">For accredited investors and high-net-worth families</a>
 <h1>Fiduciary advice for DSTs, Opportunity Zones and tax-driven alternatives.</h1>
-<p class="lede">A Texas-registered investment adviser led by a CFP® and CPA. Flat, disclosed fees. One coordinated plan for your alternatives and your core portfolio.</p>
+<p class="lede">A Texas-registered investment adviser led by a CFP® and CPA. Clearly disclosed fees. One coordinated plan for your alternatives and your core portfolio.</p>
 <div class="btns"><a class="btn" href="#builder-band">Build your strategy</a><a class="btn ghost" href="{L('contact')}">Book a consultation</a></div>
 </div>
 <div class="creds"><div class="wrap"><span>Texas-registered investment adviser</span><span>CFP® · CPA · CBDA</span><span>Fiduciary on every recommendation</span><span>McKinney, Texas</span></div></div>
@@ -924,8 +924,8 @@ def build():
     if os.path.exists(OUT):
         shutil.rmtree(OUT)
     os.makedirs(OUT)
-    reg("home", "Nashional Investments | DST and Opportunity Zone Advisor",
-        "Texas-registered fiduciary advisor for 1031 exchanges, DSTs, Opportunity Zones and tax-driven alternatives. Led by a CFP® and CPA. Flat, disclosed fees.", lambda: (home(), [HOME_FAQ[1]]))
+    reg("home", "Nashional Investments | McKinney, TX DST & Opportunity Zone Advisor",
+        "Fiduciary investment adviser in McKinney, Texas, for 1031 exchanges, DSTs, Opportunity Zones and tax-driven alternatives. Led by a CFP® and CPA.", lambda: (home(), [HOME_FAQ[1]]))
     reg("alternatives", "Alternative Investment Advisor", "Fiduciary review of DSTs, Opportunity Zone funds, energy programs and private funds for accredited investors, compared on tax, hold period and liquidity.", lambda: (alternatives(), []), "alternatives")
     reg("dst", "DST 1031 Exchange Advisor in Texas", "How 1031 exchanges into Delaware Statutory Trusts work, the deadlines and debt rules, their trade-offs, and how a fiduciary evaluates a DST sponsor.", dst, "alternatives")
     reg("qoz", "Opportunity Zone Investing: 2026 and 2027 Rules", "How Qualified Opportunity Fund investing works: the 180-day window, the 10-year exclusion, and the new rules for investments from January 1, 2027.", qoz, "alternatives")
@@ -993,6 +993,12 @@ def write_extras():
         urls = "".join(f"<url><loc>{SITE}/{p}</loc><lastmod>{TODAY}</lastmod></url>" for p in PAGES_OUT if p != "404/")
         open(os.path.join(OUT, "sitemap.xml"), "w").write(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
         open(os.path.join(OUT, "_redirects"), "w").write("/cash-balance-plan /tax-strategies/cash-balance-plans/ 301\n/map /contact/ 301\n")
+        # GitHub Pages cannot send 301s, so old Wix URLs get small forwarding pages that point search engines at the new page.
+        for old, new in (("map", "contact"), ("cash-balance-plan", "cbp")):
+            d = os.path.join(OUT, old)
+            os.makedirs(d, exist_ok=True)
+            url = SITE + "/" + PAGES[new]
+            open(os.path.join(d, "index.html"), "w").write(f'<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved</title><link rel="canonical" href="{url}"><meta name="robots" content="noindex,follow"><meta http-equiv="refresh" content="0; url={url}"></head><body><p>This page has moved to <a href="{url}">{url}</a>.</p></body></html>')
     llms = f"""# Nashional Investments
 
 > Nashional Investments (legal name {FIRM['legal']}) is a fee-based, fiduciary registered investment adviser in McKinney, Texas, registered with the Texas State Securities Board and in New Jersey. The firm advises accredited investors and high-net-worth families on 1031 exchanges and Delaware Statutory Trusts (DSTs), Qualified Opportunity Zone funds, energy tax strategies, private markets and digital assets, alongside tax-aware portfolio management. Led by Jeff Nash, CFP(R), CPA (CRD 6031965) and Denver McClure, CBDA (CRD 7319835). Firm CRD 289955.
